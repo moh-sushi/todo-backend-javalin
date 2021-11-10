@@ -38,7 +38,7 @@ public class TodoBackendRepositoryHibernateImpl implements TodoBackendRepository
     entry.setUrl(url);
     session.save(entry);
     boolean x = true;
-    if (x) throw new RuntimeException();
+//    if (x) throw new RuntimeException(); // only for tests exception handling
     return entry;
   }
 
