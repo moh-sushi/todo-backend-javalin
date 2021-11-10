@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-class TodoBackendRepositoryImpl implements TodoBackendRepository {
+@Deprecated
+class TodoBackendRepositoryMapImpl implements TodoBackendRepository {
   private final Map<Long, TodoBackendEntry> inMemoryDb = new HashMap<>();
   private final AtomicLong counter = new AtomicLong(0);
 

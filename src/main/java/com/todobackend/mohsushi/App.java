@@ -1,13 +1,16 @@
 package com.todobackend.mohsushi;
 
+import com.todobackend.mohsushi.event.H2EventListener;
+import com.todobackend.mohsushi.handler.DbExceptionHandler;
+import com.todobackend.mohsushi.handler.DbTransactionHandler;
 import io.javalin.Javalin;
-import io.javalin.core.event.EventHandler;
-import io.javalin.core.event.EventListener;
 import io.javalin.core.util.Header;
 import io.javalin.core.util.RouteOverviewPlugin;
+import io.javalin.core.validation.Validator;
+import io.javalin.http.Context;
+import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
-
-import java.util.function.Consumer;
+import org.jetbrains.annotations.NotNull;
 
 public class App {
 
@@ -20,26 +23,17 @@ public class App {
       config.registerPlugin(new RouteOverviewPlugin("/overview"));
     });
 
-    final TodoBackendRepository repository = new TodoBackendRepositoryImpl();
-//    repository.create(new TodoBackendEntry(-1L, "http://localhost:7000/-1", "bla", 23L, Boolean.FALSE), "http://localhost:7000/todos/-1");
-
-    mapEndpoints(app, repository);
-
-    app.events(event -> {
-      event.serverStarting(HibernateUtil::createSessionFactory);
-      event.serverStopping(() -> {
-        HibernateUtil.closeSessionFactory();
-        System.out.println("is stopping");
-      });
-      event.serverStopped(() -> System.out.println("stopped"));
-    });
+    mapEndpoints(app);
+    app.events(new H2EventListener());
+    app.before(new DbTransactionHandler(DbTransactionHandler.HandlerType.BEFORE, HibernateUtil::get));
+    app.after(new DbTransactionHandler(DbTransactionHandler.HandlerType.AFTER, HibernateUtil::get));
+    app.exception(Exception.class, new DbExceptionHandler());
 
     app.start(7000);
-
     Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
   }
 
-  private static void mapEndpoints(Javalin app, TodoBackendRepository repository) {
+  private static void mapEndpoints(Javalin app) {
     // alle responses -> json
     // FIXME / get -> alle todos anzeigen
     // FIXME / delete -> alle todos loeschen
@@ -61,16 +55,21 @@ public class App {
       }
     });
 
-    app.get("/", ctx -> ctx.json(repository.all()));
-    app.delete("/", ctx -> repository.deleteAll());
+    app.get("/", ctx -> ctx.json(new TodoBackendRepositoryHibernateImpl(ctx).all()));
+    app.delete("/", ctx -> new TodoBackendRepositoryHibernateImpl(ctx).deleteAll());
 
     app.post("/", ctx -> {
       final TodoBackendEntry entry = ctx.bodyAsClass(TodoBackendEntry.class);
-      ctx.json(repository.create(entry, ctx.url()));
+      ctx.json(new TodoBackendRepositoryHibernateImpl(ctx).create(entry, ctx.url()));
     });
 
     app.get("/<id>", ctx -> {
-      TodoBackendEntry entry = repository.get(Long.parseLong(ctx.pathParam("id")));
+      Validator<Long> idValidator = ctx.pathParamAsClass("id", Long.class);
+      if(!idValidator.errors().isEmpty()) {
+        ctx.status(404);
+        return;
+      }
+      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).get(idValidator.get());
       if (entry == null) {
         throw new NotFoundResponse("no entry with id " + ctx.pathParam("id"));
       } else {
@@ -79,7 +78,7 @@ public class App {
     });
 
     app.delete("/<id>", ctx -> {
-      TodoBackendEntry entry = repository.delete(Long.parseLong(ctx.pathParam("id")));
+      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).delete(Long.parseLong(ctx.pathParam("id")));
       if (entry == null) {
         throw new NotFoundResponse("no entry with id " + ctx.pathParam("id"));
       } else {
@@ -88,7 +87,7 @@ public class App {
     });
 
     app.patch("/<id>", ctx -> {
-      TodoBackendEntry entry = repository.update(Long.parseLong(ctx.pathParam("id")), ctx.bodyAsClass(TodoBackendEntry.class));
+      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).update(Long.parseLong(ctx.pathParam("id")), ctx.bodyAsClass(TodoBackendEntry.class));
       if (entry == null) {
         throw new NotFoundResponse("no entry with id " + ctx.pathParam("id"));
       } else {
