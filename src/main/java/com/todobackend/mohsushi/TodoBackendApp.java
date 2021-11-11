@@ -69,7 +69,12 @@ public class TodoBackendApp {
     });
 
     app.delete("/<id>", ctx -> {
-      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).delete(Long.parseLong(ctx.pathParam("id")));
+      Validator<Long> idValidator = ctx.pathParamAsClass("id", Long.class);
+      if(!idValidator.errors().isEmpty()) {
+        ctx.status(404);
+        return;
+      }
+      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).delete(idValidator.get());
       if (entry == null) {
         throw new NotFoundResponse("no entry with id " + ctx.pathParam("id"));
       } else {
@@ -78,7 +83,12 @@ public class TodoBackendApp {
     });
 
     app.patch("/<id>", ctx -> {
-      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).update(Long.parseLong(ctx.pathParam("id")), ctx.bodyAsClass(TodoBackendEntry.class));
+      Validator<Long> idValidator = ctx.pathParamAsClass("id", Long.class);
+      if(!idValidator.errors().isEmpty()) {
+        ctx.status(404);
+        return;
+      }
+      TodoBackendEntry entry = new TodoBackendRepositoryHibernateImpl(ctx).update(idValidator.get(), ctx.bodyAsClass(TodoBackendEntry.class));
       if (entry == null) {
         throw new NotFoundResponse("no entry with id " + ctx.pathParam("id"));
       } else {
