@@ -20,7 +20,7 @@ public abstract class HibernateUtil {
   }
 
   public static SessionFactory get() {
-    return Objects.requireNonNull(sessionFactory);
+    return Objects.requireNonNull(sessionFactory, "SessionFactory not set before? Or SessionFactory has been set to null.");
   }
 
   public static Session session(final Context context) {
