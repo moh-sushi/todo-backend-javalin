@@ -24,8 +24,8 @@ public class App {
 
     mapEndpoints(app);
     app.events(new H2EventListener());
-    app.before(new DbTransactionHandler(DbTransactionHandler.HandlerType.BEFORE, HibernateUtil::get));
-    app.after(new DbTransactionHandler(DbTransactionHandler.HandlerType.AFTER, HibernateUtil::get));
+    app.before(DbTransactionHandler.before(HibernateUtil::get));
+    app.after(DbTransactionHandler.after(HibernateUtil::get));
     app.exception(Exception.class, new DbExceptionHandler());
 
     app.start(7000);

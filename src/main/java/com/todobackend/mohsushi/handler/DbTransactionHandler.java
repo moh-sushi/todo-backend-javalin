@@ -14,7 +14,7 @@ public class DbTransactionHandler implements Handler {
   private final HandlerType handlerType;
   private final Supplier<SessionFactory> ssf;
 
-  public DbTransactionHandler(HandlerType handlerType, Supplier<SessionFactory> ssf) {
+  DbTransactionHandler(HandlerType handlerType, Supplier<SessionFactory> ssf) {
     this.handlerType = Objects.requireNonNull(handlerType);
     this.ssf = Objects.requireNonNull(ssf);
   }
@@ -40,7 +40,15 @@ public class DbTransactionHandler implements Handler {
     }
   }
 
-  public static enum HandlerType {
+  public static DbTransactionHandler before(final Supplier<SessionFactory> ssf) {
+    return new DbTransactionHandler(HandlerType.BEFORE, ssf);
+  }
+
+  public static DbTransactionHandler after(final Supplier<SessionFactory> ssf) {
+    return new DbTransactionHandler(HandlerType.AFTER, ssf);
+  }
+
+  static enum HandlerType {
     BEFORE, AFTER
   }
 
