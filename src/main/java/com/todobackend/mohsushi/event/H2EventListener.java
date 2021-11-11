@@ -17,7 +17,7 @@ public class H2EventListener implements Consumer<EventListener> {
     eventListener.serverStarting(() -> {
       Configuration config = new Configuration();
       config.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-      config.setProperty("hibernate.connection.url", "jdbc:h2:~/todo-backend-javalin;AUTO_SERVER=true");
+      config.setProperty("hibernate.connection.url", "jdbc:h2:~/todo-backend-javalin;DB_CLOSE_ON_EXIT=TRUE;AUTO_SERVER=true");
       config.setProperty("hibernate.connection.username", "sa");
       config.setProperty("hibernate.connection.password", "sa");
       config.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
