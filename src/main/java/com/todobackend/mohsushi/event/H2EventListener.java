@@ -22,10 +22,8 @@ public class H2EventListener implements Consumer<EventListener> {
       config.setProperty("hibernate.connection.password", "sa");
       config.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
       config.setProperty("hibernate.show_sql", "true");
-      //
       config.setProperty("hibernate.hbm2ddl.auto", "create-drop");
       config.addAnnotatedClass(TodoBackendEntry.class);
-
       sessionFactory=config.buildSessionFactory();
       HibernateUtil.set(sessionFactory);
     });
