@@ -1,5 +1,6 @@
 package com.todobackend.mohsushi.handler;
 
+import com.todobackend.mohsushi.HibernateUtil;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.hibernate.Session;
@@ -25,10 +26,10 @@ public class DbTransactionHandler implements Handler {
       case BEFORE -> {
         final Session session = ssf.get().openSession();
         session.beginTransaction();
-        ctx.req.setAttribute(DbTransactionHandler.class.getSimpleName(), session);
+        HibernateUtil.setSession(ctx, session);
       }
       case AFTER -> {
-        try (Session session = Objects.requireNonNull((Session) ctx.req.getAttribute(DbTransactionHandler.class.getSimpleName()))) {
+        try (Session session = Objects.requireNonNull(HibernateUtil.session(ctx))) {
           boolean open = session.isOpen();
           boolean active = session.getTransaction().isActive();
           if (open && active) {
@@ -48,7 +49,7 @@ public class DbTransactionHandler implements Handler {
     return new DbTransactionHandler(HandlerType.AFTER, ssf);
   }
 
-  static enum HandlerType {
+  private static enum HandlerType {
     BEFORE, AFTER
   }
 

@@ -26,4 +26,8 @@ public abstract class HibernateUtil {
   public static Session session(final Context context) {
     return (Session) context.req.getAttribute(DbTransactionHandler.class.getSimpleName());
   }
+
+  public static void setSession(final Context ctx, final Session session) {
+    ctx.req.setAttribute(DbTransactionHandler.class.getSimpleName(), session);
+  }
 }
