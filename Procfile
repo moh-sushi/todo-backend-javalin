@@ -1,0 +1,1 @@
+web java -Dserver.port=$PORT $JAVA_OPTS -jar target/javalin-0.1-SNAPSHOT-jar-with-dependencies.jar
