@@ -3,11 +3,11 @@ package com.todobackend.mohsushi.configuration;
 import java.util.Objects;
 import java.util.Properties;
 
-public class SystemPropertiesConfiguration implements Configuration {
+public class SystemPropertiesConfigurationImpl implements Configuration {
 
   private final Properties props;
 
-  public SystemPropertiesConfiguration(Properties props) {
+  public SystemPropertiesConfigurationImpl(Properties props) {
     this.props = Objects.requireNonNull(props);
   }
 

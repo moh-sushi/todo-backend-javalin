@@ -1,7 +1,7 @@
 package com.todobackend.mohsushi;
 
 import com.todobackend.mohsushi.configuration.Configuration;
-import com.todobackend.mohsushi.configuration.SystemPropertiesConfiguration;
+import com.todobackend.mohsushi.configuration.SystemPropertiesConfigurationImpl;
 import com.todobackend.mohsushi.event.H2EventListener;
 import com.todobackend.mohsushi.handler.DbExceptionHandler;
 import com.todobackend.mohsushi.handler.DbTransactionHandler;
@@ -16,7 +16,7 @@ import io.javalin.http.NotFoundResponse;
 public class App {
 
   public static void main(String[] args) {
-    final Configuration configuration = new SystemPropertiesConfiguration(System.getProperties());
+    final Configuration configuration = new SystemPropertiesConfigurationImpl(System.getProperties());
     Javalin app = Javalin.create(config -> {
       config.enableDevLogging();
 //      config.enableCorsForOrigin("https://www.todobackend.com/");
