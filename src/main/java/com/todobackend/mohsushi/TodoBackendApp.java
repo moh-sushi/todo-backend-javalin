@@ -6,7 +6,6 @@ import com.todobackend.mohsushi.event.H2EventListener;
 import com.todobackend.mohsushi.handler.DbExceptionHandler;
 import com.todobackend.mohsushi.handler.DbTransactionHandler;
 import io.javalin.Javalin;
-import io.javalin.core.util.Header;
 import io.javalin.core.util.RouteOverviewPlugin;
 import io.javalin.core.validation.BodyValidator;
 import io.javalin.core.validation.Validator;
@@ -18,6 +17,7 @@ public class TodoBackendApp {
   public static void main(String[] args) {
     final Configuration configuration = new SystemPropertiesConfigurationImpl(System.getProperties());
     Javalin app = Javalin.create(config -> {
+      config.defaultContentType = "application/json";
       config.enableDevLogging();
 //      config.enableCorsForOrigin("https://www.todobackend.com/");
 //      config.contextPath = "/todos";
@@ -44,18 +44,6 @@ public class TodoBackendApp {
     // FIXME /{id} get json todo -> todo mit id laden
     // FIXME /{id} delete json todo -> todo mit id loeschen
     // FIXME /{id} patch json todo -> todo mit id aktualisieren
-
-    app.before(ctx -> {
-      if ("OPTIONS".equals(ctx.method())) {
-        ctx.header(Header.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-      }
-      if (ctx.header(Header.ACCESS_CONTROL_REQUEST_HEADERS) != null) {
-        ctx.header(Header.ACCESS_CONTROL_ALLOW_HEADERS);
-      }
-      if (ctx.header(Header.ACCESS_CONTROL_REQUEST_METHOD) != null) {
-        ctx.header(Header.ACCESS_CONTROL_ALLOW_METHODS);
-      }
-    });
 
     app.get("/", ctx -> ctx.json(new TodoBackendRepositoryHibernateImpl(ctx).all()));
     app.delete("/", ctx -> new TodoBackendRepositoryHibernateImpl(ctx).deleteAll());
