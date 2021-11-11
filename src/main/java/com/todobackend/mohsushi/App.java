@@ -6,7 +6,9 @@ import com.todobackend.mohsushi.handler.DbTransactionHandler;
 import io.javalin.Javalin;
 import io.javalin.core.util.Header;
 import io.javalin.core.util.RouteOverviewPlugin;
+import io.javalin.core.validation.BodyValidator;
 import io.javalin.core.validation.Validator;
+import io.javalin.http.InternalServerErrorResponse;
 import io.javalin.http.NotFoundResponse;
 
 public class App {
@@ -56,8 +58,9 @@ public class App {
     app.delete("/", ctx -> new TodoBackendRepositoryHibernateImpl(ctx).deleteAll());
 
     app.post("/", ctx -> {
-      final TodoBackendEntry entry = ctx.bodyAsClass(TodoBackendEntry.class);
-      ctx.json(new TodoBackendRepositoryHibernateImpl(ctx).create(entry, ctx.url()));
+      BodyValidator<TodoBackendEntry> bodyValidator = ctx.bodyValidator(TodoBackendEntry.class);
+      if (!bodyValidator.errors().isEmpty()) throw new InternalServerErrorResponse("no valid input data");
+      ctx.json(new TodoBackendRepositoryHibernateImpl(ctx).create(bodyValidator.get(), ctx.url()));
     });
 
     app.get("/<id>", ctx -> {
