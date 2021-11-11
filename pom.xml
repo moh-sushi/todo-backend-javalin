@@ -7,6 +7,8 @@
   <groupId>com.todobackend.moh-sushi</groupId>
   <artifactId>javalin</artifactId>
   <version>0.1-SNAPSHOT</version>
+  <description>example implementation of todo-backend (https://www.todobackend.com)</description>
+  <url>https://github.com/moh-sushi/todo-backend-javalin</url>
 
   <dependencies>
     <dependency>
