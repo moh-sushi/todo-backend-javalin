@@ -13,7 +13,7 @@ import io.javalin.core.validation.Validator;
 import io.javalin.http.InternalServerErrorResponse;
 import io.javalin.http.NotFoundResponse;
 
-public class App {
+public class TodoBackendApp {
 
   public static void main(String[] args) {
     final Configuration configuration = new SystemPropertiesConfigurationImpl(System.getProperties());
